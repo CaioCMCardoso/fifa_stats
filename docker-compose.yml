@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.letsencrypt.acme.email=SEU_EMAIL_AQUI
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
+
+      # opcional (você pode tirar depois)
+      - --api.dashboard=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/acme.json
+    networks:
+      - traefik
+
+  api:
+    build:
+      context: ./fifa_stats-api
+    container_name: fifa_stats_api
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+
+      # 1) HTTP -> redireciona para HTTPS
+      - traefik.http.routers.fifa_api_http.rule=Host(`roca-stats.duckdns.org`)
+      - traefik.http.routers.fifa_api_http.entrypoints=web
+      - traefik.http.routers.fifa_api_http.middlewares=redirect-to-https
+
+      # middleware do redirect
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      # 2) HTTPS -> entrega a API
+      - traefik.http.routers.fifa_api_https.rule=Host(`roca-stats.duckdns.org`)
+      - traefik.http.routers.fifa_api_https.entrypoints=websecure
+      - traefik.http.routers.fifa_api_https.tls=true
+      - traefik.http.routers.fifa_api_https.tls.certresolver=letsencrypt
+
+      # porta interna do container da API
+      - traefik.http.services.fifa_api.loadbalancer.server.port=8000
+
+networks:
+  traefik:
+    external: true

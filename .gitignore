@@ -9,3 +9,6 @@ logs/
 # python
 __pycache__/
 *.pyc
+
+# traefik
+traefik/acme.json
