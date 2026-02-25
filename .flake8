@@ -1,0 +1,25 @@
+[flake8]
+
+# Permitir linhas maiores (bom para schemas e responses JSON)
+max-line-length = 120
+
+# Ignorar regras comuns em APIs modernas
+extend-ignore =
+    E203,   # conflito com black slicing
+    W503,   # line break before binary operator
+    E501    # linha longa (controlada pelo max-line-length)
+
+# Pastas ignoradas
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist
+
+# Mostrar origem do erro
+show-source = True
+
+# Estatísticas no final
+statistics = True
