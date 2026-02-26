@@ -111,3 +111,16 @@ class PlayerStatsCsvRepository:
         out.sort(key=lambda x: x["name"].lower())
 
         return out
+
+    def delete_player(self, player_name: str) -> dict:
+        key_name = player_name.strip()
+        rows = self._read_all_rows()
+
+        filtered_rows = [r for r in rows if (r.get("player_name") or "").strip() != key_name]
+        deleted_count = len(rows) - len(filtered_rows)
+
+        if deleted_count == 0:
+            return {"success": False, "deleted_rows": 0, "player_name": key_name}
+
+        self._write_all_rows(filtered_rows)
+        return {"success": True, "deleted_rows": deleted_count, "player_name": key_name}
