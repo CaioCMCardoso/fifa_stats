@@ -2,8 +2,7 @@ name: Deploy EC2
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -13,18 +12,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Debug DNS + reachability
         run: |
+          echo "Host: ${{ secrets.EC2_HOST }}"
+          nslookup ${{ secrets.EC2_HOST }} || true
+          getent hosts ${{ secrets.EC2_HOST }} || true
+          # testa se a porta 22 responde (não precisa de auth)
+          timeout 5 bash -c "cat < /dev/null > /dev/tcp/${{ secrets.EC2_HOST }}/22" && echo "Port 22 OK" || echo "Port 22 FAIL"
+
+      - name: Setup SSH key
+        run: |
+          set -eux
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
+
+          echo "${{ secrets.EC2_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+          ssh-keyscan -4 -T 10 -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy on EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=yes ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -eux
             cd ~/fifa_stats
             git pull origin main
-            docker compose down
             docker compose up -d --build
           EOF
