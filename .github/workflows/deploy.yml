@@ -36,5 +36,5 @@ jobs:
             set -eux
             cd ~/fifa_stats
             git pull origin main
-            docker-compose up -d --build
+            docker compose up -d --build --remove-orphans
           EOF
