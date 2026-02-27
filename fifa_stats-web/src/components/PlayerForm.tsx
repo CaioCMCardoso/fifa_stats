@@ -26,6 +26,11 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
     outline: "none",
   };
 
+  function toNumber(rawValue: string) {
+    const digitsOnly = rawValue.replace(/\D/g, "");
+    return digitsOnly === "" ? 0 : Number(digitsOnly);
+  }
+
   return (
     <section style={{ marginTop: 20 }}>
       <h2>Registrar partida</h2>
@@ -72,12 +77,12 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
         <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
           Nº da camisa
           <input
-            type="number"
-            min={0}
-            max={99}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="Ex: 9"
             value={value.player_number}
-            onChange={(e) => onChange({ ...value, player_number: Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, player_number: toNumber(e.target.value) })}
             style={inputStyle}
             required
           />
@@ -102,11 +107,12 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
         <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
           Gols
           <input
-            type="number"
-            min={0}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="0"
             value={value.goals}
-            onChange={(e) => onChange({ ...value, goals: Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, goals: toNumber(e.target.value) })}
             style={inputStyle}
           />
         </label>
@@ -114,11 +120,12 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
         <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
           Assistências
           <input
-            type="number"
-            min={0}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="0"
             value={value.assists}
-            onChange={(e) => onChange({ ...value, assists: Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, assists: toNumber(e.target.value) })}
             style={inputStyle}
           />
         </label>
