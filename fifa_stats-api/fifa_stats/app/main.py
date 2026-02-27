@@ -18,6 +18,7 @@ app.include_router(player_stats_router)
 origins = [
     "http://localhost:5173",
     "http://fifa-stats-web-caio.s3-website-sa-east-1.amazonaws.com",
+    "https://d3rigmp2vmwhhk.cloudfront.net/"
 ]
 
 app.add_middleware(
