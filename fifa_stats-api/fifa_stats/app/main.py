@@ -15,9 +15,14 @@ app = FastAPI(title=cfg.APP_NAME, version="0.1.0")
 app.include_router(health_router)
 app.include_router(player_stats_router)
 
+origins = [
+    "http://localhost:5173",
+    "http://fifa-stats-web-caio.s3-website-sa-east-1.amazonaws.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
