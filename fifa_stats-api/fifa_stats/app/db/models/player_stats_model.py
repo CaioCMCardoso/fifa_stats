@@ -46,17 +46,26 @@ class PlayerDailyStatItem:
 
     @classmethod
     def from_item(cls, item: dict) -> "PlayerDailyStatItem":
+        created_at = item.get("created_at", "")
+        updated_at = item.get("updated_at", "")
+        fallback_day = (
+            item.get("day")
+            or _extract_iso_date(created_at)
+            or _extract_iso_date(updated_at)
+            or "1970-01-01"
+        )
+
         return cls(
             team_id=item["team_id"],
             player_id=item["player_id"],
-            day=item["day"],
-            name=item["name"],
+            day=fallback_day,
+            name=(item.get("name") or item.get("player_name") or "").strip(),
             shirt_number=int(item.get("shirt_number", 0)),
             position=item.get("position", ""),
             goals=int(item.get("goals", 0)),
             assists=int(item.get("assists", 0)),
-            created_at=item.get("created_at", ""),
-            updated_at=item.get("updated_at", ""),
+            created_at=created_at,
+            updated_at=updated_at,
         )
 
     def to_item(self) -> dict:
@@ -72,3 +81,16 @@ class PlayerDailyStatItem:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
+
+
+def _extract_iso_date(value: str) -> str | None:
+    if not value or len(value) < 10:
+        return None
+
+    date_part = value[:10]
+    try:
+        datetime.fromisoformat(date_part)
+    except ValueError:
+        return None
+
+    return date_part

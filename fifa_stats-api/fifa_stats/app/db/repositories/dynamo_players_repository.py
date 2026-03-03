@@ -29,6 +29,8 @@ class DynamoPlayersRepository:
 
         for item in self._query_all_team_items():
             stat = PlayerDailyStatItem.from_item(item)
+            if not stat.name:
+                continue
 
             if stat.name not in players:
                 players[stat.name] = {
