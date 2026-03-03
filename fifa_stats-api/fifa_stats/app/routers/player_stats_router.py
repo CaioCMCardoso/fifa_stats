@@ -1,14 +1,12 @@
 from fastapi import APIRouter
 
 from fifa_stats.app.exceptions.exceptions import AppException
-from fifa_stats.app.settings.configuration import Configuration
 from fifa_stats.app.schemas.player_stats_schema import UpsertDailyStatIn, PlayerOut
-from fifa_stats.app.repositories.player_stats_csv_repository import PlayerStatsCsvRepository
+from fifa_stats.app.db.repositories import DynamoPlayersRepository
 
 router = APIRouter(prefix="", tags=["players"])
 
-cfg = Configuration.instance()
-repo = PlayerStatsCsvRepository(cfg.CSV_PATH)
+repo = DynamoPlayersRepository()
 
 
 @router.get("/players", response_model=list[PlayerOut])
