@@ -20,6 +20,9 @@ class Configuration:
 
         # onde fica o CSV
         self.CSV_PATH = env.get(str, "CSV_PATH", default="./data/player_stats.csv")
+        self.AWS_REGION = env.get(str, "AWS_REGION", default="sa-east-1")
+        self.DYNAMO_TABLE_NAME = env.get(str, "DYNAMO_TABLE_NAME", default="fifa_players")
+        self.DYNAMO_TEAM_ID = env.get(str, "DYNAMO_TEAM_ID", default="Rocambole")
 
         self.LOGFILE_PATH = env.get(str, "LOGFILE_PATH", "file.log")
         self.LOG_LEVEL = "ERROR" if probe else env.get(str, "LOG_LEVEL", "INFO")
