@@ -66,7 +66,7 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
         <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
           Nome do jogador
           <input
-            placeholder="Ex: Caio"
+            placeholder="Ex: Cardoso"
             value={value.player_name}
             onChange={(e) => onChange({ ...value, player_name: e.target.value })}
             style={inputStyle}
