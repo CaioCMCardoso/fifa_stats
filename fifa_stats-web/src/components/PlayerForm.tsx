@@ -80,7 +80,7 @@ export function PlayerForm({ value, onChange, onSubmit, loading }: Props) {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            placeholder="Ex: 9"
+            placeholder="Ex: 99"
             value={value.player_number}
             onChange={(e) => onChange({ ...value, player_number: toNumber(e.target.value) })}
             style={inputStyle}
