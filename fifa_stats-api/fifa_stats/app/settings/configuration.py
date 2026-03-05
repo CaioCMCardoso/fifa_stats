@@ -23,6 +23,23 @@ class Configuration:
         self.AWS_REGION = env.get(str, "AWS_REGION", default="sa-east-1")
         self.DYNAMO_TABLE_NAME = env.get(str, "DYNAMO_TABLE_NAME", default="fifa_players")
         self.DYNAMO_TEAM_ID = env.get(str, "DYNAMO_TEAM_ID", default="Rocambole")
+        self.FC_CLUBS_API_BASE_URL = env.get(
+            str, "FC_CLUBS_API_BASE_URL", default="http://localhost:3000"
+        )
+        self.FC_CLUBS_API_SOURCE = env.get(
+            str, "FC_CLUBS_API_SOURCE", default="fc26-clubs-api"
+        )
+        self.FC_CLUBS_API_CLUB_ID = env.get(str, "FC_CLUBS_API_CLUB_ID", default="")
+        self.FC_CLUBS_API_CLUB_NAME = env.get(str, "FC_CLUBS_API_CLUB_NAME", default="")
+        self.FC_CLUBS_API_PLATFORM = env.get(str, "FC_CLUBS_API_PLATFORM", default="common-gen5")
+        self.FC_CLUBS_SEARCH_PATH = env.get(str, "FC_CLUBS_SEARCH_PATH", default="/clubs/search")
+        self.FC_CLUBS_DETAILS_PATH = env.get(str, "FC_CLUBS_DETAILS_PATH", default="/clubs/{club_id}")
+        self.FC_CLUBS_MATCHES_PATH = env.get(
+            str, "FC_CLUBS_MATCHES_PATH", default="/clubs/{club_id}/matches"
+        )
+        self.FC_CLUBS_API_TIMEOUT_SECONDS = env.get(
+            int, "FC_CLUBS_API_TIMEOUT_SECONDS", default=12
+        )
 
         self.LOGFILE_PATH = env.get(str, "LOGFILE_PATH", "file.log")
         self.LOG_LEVEL = "ERROR" if probe else env.get(str, "LOG_LEVEL", "INFO")

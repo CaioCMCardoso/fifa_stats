@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { deletePlayer, fetchPlayers, upsertStats, type Player, type UpsertPayload } from "../api/players";
+import { fetchTeamOverview, syncTeamStats, type TeamOverview } from "../api/team";
 
 export function usePlayers() {
   const todayISO = new Date().toISOString().slice(0, 10);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [teamOverview, setTeamOverview] = useState<TeamOverview | null>(null);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   const [form, setForm] = useState<UpsertPayload>({
     day: todayISO,
@@ -60,6 +65,18 @@ export function usePlayers() {
     }
   }
 
+  async function loadTeam() {
+    setTeamLoading(true);
+    try {
+      const data = await fetchTeamOverview();
+      setTeamOverview(data);
+    } catch (e: any) {
+      setError(e?.message ?? "Erro ao buscar dados do time");
+    } finally {
+      setTeamLoading(false);
+    }
+  }
+
   async function submit() {
     setLoading(true);
     setError(null);
@@ -67,6 +84,7 @@ export function usePlayers() {
       await upsertStats(form);
       setForm((f) => ({ ...f, goals: 0, assists: 0 }));
       await loadPlayers();
+      await loadTeam();
     } catch (e: any) {
       setError(e?.message ?? "Erro ao salvar stats");
     } finally {
@@ -80,6 +98,7 @@ export function usePlayers() {
     try {
       await deletePlayer(playerName);
       await loadPlayers();
+      await loadTeam();
     } catch (e: any) {
       setError(e?.message ?? "Erro ao deletar jogador");
     } finally {
@@ -90,10 +109,32 @@ export function usePlayers() {
   // equivalente ao ngOnInit: carrega ao montar
   useEffect(() => {
     loadPlayers();
+    loadTeam();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  
+  async function syncTeamPlayers() {
+    setSyncing(true);
+    setSyncMessage(null);
+    setError(null);
+
+    try {
+      const result = await syncTeamStats({
+        days_back: 7,
+        max_matches: 20,
+        dry_run: false,
+      });
+      setSyncMessage(
+        `Sync concluido: ${result.rows_upserted} registros atualizados para ${result.players_touched.length} jogadores.`
+      );
+      await loadPlayers();
+      await loadTeam();
+    } catch (e: any) {
+      setError(e?.message ?? "Erro ao sincronizar time");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   return {
     players,
@@ -101,11 +142,17 @@ export function usePlayers() {
     teamTotals,
     topContributor,
     loading,
+    teamLoading,
+    syncing,
     error,
+    teamOverview,
+    syncMessage,
     form,
     setForm,
     loadPlayers,
+    loadTeam,
     submit,
     removePlayer,
+    syncTeamPlayers,
   };
 }

@@ -1,5 +1,6 @@
 import { PlayerForm } from "./components/PlayerForm";
 import { PlayerList } from "./components/PlayerList";
+import { TeamOverviewCard } from "./components/TeamOverview";
 import { usePlayers } from "./hooks/usePlayers";
 
 export default function App() {
@@ -8,12 +9,17 @@ export default function App() {
     teamTotals,
     topContributor,
     loading,
+    teamLoading,
+    syncing,
     error,
+    teamOverview,
+    syncMessage,
     form,
     setForm,
     loadPlayers,
     submit,
     removePlayer,
+    syncTeamPlayers,
   } = usePlayers();
 
   const statCard: React.CSSProperties = {
@@ -72,6 +78,13 @@ export default function App() {
       </header>
 
       <PlayerForm value={form} onChange={setForm} onSubmit={submit} loading={loading} />
+      <TeamOverviewCard
+        value={teamOverview}
+        loading={teamLoading}
+        syncing={syncing}
+        syncMessage={syncMessage}
+        onSync={syncTeamPlayers}
+      />
       <PlayerList players={leaderboard} loading={loading} onDelete={removePlayer} />
     </div>
   );

@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fifa_stats.app.settings.configuration import Configuration
 from fifa_stats.app.routers.health_router import router as health_router
 from fifa_stats.app.routers.player_stats_router import router as player_stats_router
+from fifa_stats.app.routers.team_router import router as team_router
+from fifa_stats.app.exceptions.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -14,6 +16,7 @@ app = FastAPI(title=cfg.APP_NAME, version="0.1.0")
 
 app.include_router(health_router)
 app.include_router(player_stats_router)
+app.include_router(team_router)
 
 origins = [
     "http://localhost:5173",
@@ -28,6 +31,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+register_exception_handlers(app)
 
 
 @app.get("/")
